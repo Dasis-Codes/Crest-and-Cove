@@ -29,9 +29,14 @@
                 <div class="card card-product-grid">
                     <a href="{{ product.get_url }}" class="img-wrap"> <img src="{{ product.images.url }}"> </a>
                     <figcaption class="info-wrap">
-                        <a href="{{product.get_url}}" class="title">{{ product.product_name }}</a>
-                        <small class="text-muted">{{ product.description|truncatewords:10 }}</small>
-                        <div class="price mt-1">${{ product.price|floatformat:2 }}</div> <!-- price-wrap.// -->
+                        {% comment %} <div class="fix-height"> {% endcomment %}
+                            <a href="{{product.get_url}}" class="title">{{ product.product_name }}</a>
+                            <small class="text-muted">{{ product.description|truncatewords:10 }}</small>
+                            <div class="price mt-1">${{ product.price|floatformat:2 }}</div> <!-- price-wrap.// -->
+                            <a href="{{ product.get_url }}" class="btn btn-primary" style="margin-top:10px;">
+                                View Product Details
+                            </a>
+                        {% comment %} </div> {% endcomment %}
                     </figcaption>
                 </div>
             </div> <!-- col.// -->
