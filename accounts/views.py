@@ -17,6 +17,9 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.urls import reverse
 from urllib.parse import urlencode
+from carts.views import _cart_id, cart
+from carts.models import Cart, CartItem
+import requests
 
 account_activation_token = PasswordResetTokenGenerator()
 # Create your views here.
@@ -88,9 +91,49 @@ def login(request):
         password = request.POST['password']
         user = auth.authenticate(request, email=email, password=password)
         if user is not None:
+            cart_id = _cart_id(request)
             auth.login(request, user)
+
+            cart = Cart.objects.filter(cart_id=cart_id).first()
+            if cart is not None:
+                cart.cart_id = _cart_id(request)
+                cart.save(update_fields=['cart_id'])
+
+                guest_items = CartItem.objects.filter(cart=cart, user__isnull=True)
+                for guest_item in guest_items:
+                    guest_variation_ids = set(guest_item.variations.values_list('id', flat=True))
+                    matching_item = None
+
+                    user_items = CartItem.objects.filter(
+                        user=user,
+                        product=guest_item.product,
+                        is_active=True,
+                    ).exclude(pk=guest_item.pk)
+                    for user_item in user_items:
+                        user_variation_ids = set(user_item.variations.values_list('id', flat=True))
+                        if user_variation_ids == guest_variation_ids:
+                            matching_item = user_item
+                            break
+
+                    if matching_item is not None:
+                        matching_item.quantity += guest_item.quantity
+                        matching_item.save(update_fields=['quantity'])
+                        guest_item.delete()
+                    else:
+                        guest_item.user = user
+                        guest_item.save(update_fields=['user'])
+
             messages.success(request, 'Login successful! Welcome back!')
-            return redirect('dashboard')
+            url = request.META.get('HTTP_REFERER')
+            try:
+                query = requests.utils.urlparse(url).query
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    nextPage = params['next']
+                    return redirect(nextPage)
+                
+            except:
+                return redirect('dashboard')
 
         else:
             messages.error(request, 'Invalid Credentials')

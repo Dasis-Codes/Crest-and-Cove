@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        <div class="row">
+
+            <aside class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Billing Details</h4>
+                        <form id="checkout-form" action="{% url 'checkout' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="form-action">
+                                <div class="form-row">
+                                    <div class="col form-group">
+                                        <label for="first-name">First Name</label>
+                                        <input type="text" class="form-control" id="first-name" placeholder="First Name"
+                                            name="first_name" required>
+                                    </div>
+                                    <div class="col form-group">
+                                        <label for="last-name">Last Name</label>
+                                        <input type="text" class="form-control" id="last-name" placeholder="Last Name"
+                                            name="last_name" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" placeholder="Email"
+                                            name="email" required>
+                                    </div>
+                                    <div class="form-group col">
+                                        <label for="phone">Phone</label>
+                                        <input type="tel" class="form-control" id="phone" placeholder="Phone"
+                                            name="phone" required>
+                                    </div>
+                                </div>
+                                <div class="form-group col">
+                                    <label for="address-line1">Address Line 1</label>
+                                    <input type="text" class="form-control" id="address-line1"
+                                        placeholder="Address Line 1" name="address_line1" required>
+                                </div>
+                                <div class="form-group col">
+                                    <label for="address-line2">Address Line 2</label>
+                                    <input type="text" class="form-control" id="address-line2"
+                                        placeholder="Address Line 2" name="address_line2">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col">
+                                        <label for="city">City</label>
+                                        <input type="text" class="form-control" id="city" placeholder="City" name="city"
+                                            required>
+                                    </div>
+                                    <div class="form-group col">
+                                        <label for="state">State</label>
+                                        <input type="text" class="form-control" id="state" placeholder="State"
+                                            name="state" required>
+                                    </div>
+                                    <div class="form-group col">
+                                        <label for="postal-code">Postal Code</label>
+                                        <input type="text" class="form-control" id="postal_code"
+                                            placeholder="Postal Code" name="postal_code" required>
+                                    </div>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </aside> <!-- col.// -->
+
+            <aside class="col-lg-6">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <table class="table table-borderless table-shopping-cart">
+                            <thead class="text-muted">
+                                <tr class="small text-uppercase">
+                                    <th scope="col">Product</th>
+                                    <th scope="col" width="120">Quantity</th>
+                                    <th scope="col" width="120">Price</th>
+                                    <th scope="col" class="text-right" width="200"> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>
+                                        <figure class="itemside align-items-center">
+                                            <div class="aside"><img src="{{ item.product.images.url }}" class="img-sm">
+                                            </div>
+                                            <figcaption class="info">
+                                                <a href="{{ item.product.get_url }}"
+                                                    class="title text-dark">{{item.product.product_name }}</a>
+                                                <p class="text-muted small">
+                                                    {% if item.variations.all %}
+                                                    {% for variation in item.variations.all %}
+                                                    {{ variation.variation_category|capfirst }}: {{ variation.variation_value|capfirst }} 
+                                                    {% endfor%}
+                                                    {% endif %}
+                                                </p>
+                                            </figcaption>
+                                        </figure>
+                                    </td>
+                                    <td>
+                                        <div class="col">
+                                            <div class="input-group input-spinner">
+                                                <label  class="fw-bold">{{item.quantity}}</label>
+                                    </td>
+                                    <td>
+                                        <div class="price-wrap">
+                                            <var class="price">${{ item.sub_total|floatformat:2 }}</var>
+                                            <small class="text-muted"> ${{ item.product.price}} each </small>
+                                        </div> <!-- price-wrap .// -->
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <button type="submit" form="checkout-form" class="btn btn-primary btn-block">Place
+                            Order</button>
+                        <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
+                    </div> <!-- card-body.// -->
+                </div> <!-- card.// -->
+
+            </aside> <!-- col.// -->
+
+
+        </div> <!-- row.// -->
+
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
+
+    </div> <!-- container .//  -->
+</section>
+{% endblock %}
