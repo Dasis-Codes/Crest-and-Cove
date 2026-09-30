@@ -1,0 +1,13 @@
+from django.contrib import admin
+from .models import Order, OrderProduct, Payment
+# Register your models here.
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+	list_display = ('order_number', 'first_name', 'last_name', 'user', 'order_total', 'status', 'created_at')
+	list_filter = ('status', 'created_at')
+	search_fields = ('order_number', 'first_name', 'last_name', 'email', 'user__email')
+
+
+admin.site.register(OrderProduct)
+admin.site.register(Payment)

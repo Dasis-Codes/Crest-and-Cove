@@ -136,7 +136,7 @@ def login(request):
                 return redirect('dashboard')
 
         else:
-            messages.error(request, 'Invalid Credentials')
+            messages.success(request, 'Invalid Credentials: Please check your email and password and try again.')
 
 
     return render(request, 'accounts/login.html')

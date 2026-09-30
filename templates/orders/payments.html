@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% include 'includes/alerts.html' %}
+<section class="section-content padding-y bg">
+    <div class="container">
+
+
+        <div class="row">
+
+            <aside class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-4 text-center">Payment Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <b>Name:</b> {{order.full_name}}
+                        </div>
+                        <div>
+                            <b>Email:</b> {{order.email}}
+                        </div>
+                        <div>
+                            <b>Phone:</b> {{order.phone}}
+                        </div>
+                        <div>
+                            <b>Address:</b> {{order.full_address}}
+                        </div>
+                        {% if order.country %}
+                        <div>
+                            <b>Country:</b> {{order.country}}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div> <!-- card.// -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-4">Payment Method</h4>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            {% if order.payment_method == 'Credit Card' %}
+                            <b>Payment Method:</b> PayPal
+                            {% else %}
+                            <b>Payment Method:</b> Cash on Delivery
+                            {% endif %}
+                        </div>
+                    </div>
+                </div> <!-- card.// -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-4">Review Products</h4>
+                    </div>
+                    <table class="table table-borderless table-shopping-cart">
+                        <thead class="text-muted">
+                            <tr class="small text-uppercase">
+                                <th scope="col">Product</th>
+                                <th scope="col" width="120">Quantity</th>
+                                <th scope="col" width="120">Price</th>
+                                <th scope="col" class="text-right" width="200"> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>
+                                    <figure class="itemside align-items-center">
+                                        <div class="aside"><img src="{{ item.product.images.url }}" class="img-sm">
+                                        </div>
+                                        <figcaption class="info">
+                                            <a href="{{ item.product.get_url }}"
+                                                class="title text-dark">{{item.product.product_name }}</a>
+                                            <p class="text-muted small">
+                                                {% if item.variations.all %}
+                                                {% for variation in item.variations.all %}
+                                                {{ variation.variation_category|capfirst }}: {{ variation.variation_value|capfirst }}
+                                                {% endfor%}
+                                                {% endif %}
+                                            </p>
+                                        </figcaption>
+                                    </figure>
+                                </td>
+                                <td>
+                                    <div class="col">
+                                        <div class="input-group input-spinner">
+                                            <label class="fw-bold">{{item.quantity}}</label>
+                                </td>
+                                <td>
+                                    <div class="price-wrap">
+                                        <var class="price">${{ item.sub_total|floatformat:2 }}</var>
+                                        <small class="text-muted"> ${{ item.product.price}} each </small>
+                                    </div> <!-- price-wrap .// -->
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div> <!-- card.// -->
+
+            </aside> <!-- col.// -->
+
+            <aside class="col-lg-4">
+
+                <div class="card">
+                    <div class="card-body">
+                        <dl class="dlist-align">
+                            <dt>Total price:</dt>
+                            <dd class="text-right">${{ total|floatformat:2 }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Tax:</dt>
+                            <dd class="text-right"> ${{ tax|floatformat:2 }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Total:</dt>
+                            <dd class="text-right text-dark b"><strong>${{ grand_total|floatformat:2 }}</strong></dd>
+                        </dl>
+                        <hr>
+                        <p class="text-center mb-3">
+                            <img src="{% static 'images/misc/payments.png' %}" height="26">
+                        </p>
+                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Make Payment </a>
+                    </div> <!-- card-body.// -->
+                </div> <!-- card.// -->
+
+            </aside> <!-- col.// -->
+
+
+        </div>
+
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
+
+    </div> <!-- container .//  -->
+</section>
+{% endblock %}
