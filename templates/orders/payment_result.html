@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include 'includes/alerts.html' %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-body text-center">
+                        {% if result_status == 'succeeded' %}
+                        <h2 class="text-success">Payment successful</h2>
+                        <p>Thanks for buying from us!</p>                        
+                        <p>Your payment for order {{ order.order_number }} has been confirmed.</p>
+                        <p>We will make sure to deliver your order as soon as possible.</p>
+                        {% elif result_status == 'cancelled' %}
+                        <h2>Payment cancelled</h2>
+                        <p>Payment for order {{ order.order_number }} was cancelled. No successful payment was confirmed.</p>
+                        {% else %}
+                        <h2>Payment status pending</h2>
+                        <p>We have not received a verified result for order {{ order.order_number }} yet. Do not submit another payment until its status is checked.</p>
+                        {% endif %}
+                        <a href="{% url 'payments' order.id %}" class="btn btn-primary">View order</a>
+                        <a href="{% url 'store' %}" class="btn btn-light">Continue shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% if result_status == 'pending' %}
+<script>
+    (() => {
+        const statusUrl = "{% url 'payment_result_status' order.id %}";
+        let attempts = 0;
+
+        async function checkPaymentStatus() {
+            attempts += 1;
+            try {
+                const response = await fetch(statusUrl, {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store',
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status === 'succeeded' || result.status === 'cancelled') {
+                        window.location.reload();
+                        return;
+                    }
+                }
+            } catch (error) {
+                // Leave the pending page visible if the status check is temporarily unavailable.
+            }
+
+            if (attempts < 24) {
+                window.setTimeout(checkPaymentStatus, 2500);
+            }
+        }
+
+        window.setTimeout(checkPaymentStatus, 2500);
+    })();
+</script>
+{% endif %}
+{% endblock %}

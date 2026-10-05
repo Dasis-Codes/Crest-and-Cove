@@ -16,6 +16,11 @@ class Payment(models.Model):
         return self.payment_id
 
 class Order(models.Model):
+    PAYMENT_METHODS = (
+        ('Safepay', 'Safepay'),
+        ('Cash on Delivery', 'Cash on Delivery'),
+    )
+
     STATUS = (
         ('New', 'New'),
         ('Accepted', 'Accepted'),
@@ -25,6 +30,7 @@ class Order(models.Model):
 
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
+    payment_method = models.CharField(max_length=32, choices=PAYMENT_METHODS, blank=True, default='')
     order_number = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -54,10 +60,11 @@ class Order(models.Model):
 
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    cart_item = models.ForeignKey('carts.CartItem', on_delete=models.SET_NULL, blank=True, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    variation = models.ForeignKey(Variation, on_delete=models.CASCADE)
+    variation = models.ForeignKey(Variation, on_delete=models.CASCADE, null=True, blank=True)
     color = models.CharField(max_length=100)
     size = models.CharField(max_length=100)
     quantity = models.IntegerField()
@@ -65,6 +72,9 @@ class OrderProduct(models.Model):
     ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def sub_total(self):
+        return self.product_price * self.quantity
 
     def __str__(self):
         return self.product.product_name

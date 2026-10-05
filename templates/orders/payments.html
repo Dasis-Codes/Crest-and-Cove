@@ -4,15 +4,40 @@
 {% block content %}
 {% include 'includes/alerts.html' %}
 <section class="section-content padding-y bg">
+    {% if order.is_ordered %}
+    <div class="container max-auto alert alert-info text-center" role="status" style="max-width: 1000px;">
+        <h4>Thanks for buying from us!</h4>
+        {% if payment_method == 'Cash on Delivery' %}
+        <p>
+            Just a quick note that your Cash on Delivery order was placed as a demo. 
+            No payment was collected, and no product will be shipped out. We appreciate you trying things out!
+        </p>
+        {% elif payment_method == 'Safepay' %}
+        <p>
+            Just a quick heads-up: your Safepay payment was completed in sandbox mode. Since this is a demo order, 
+            no real funds were charged, and no product will be delivered. Let us know if you have any questions!
+        </p>
+        {% else %}
+        <p>This order is a demo only. No payment was collected, and no product will be shipped out. We appreciate you trying things out!</p>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="container max-auto alert alert-warning text-center" role="alert" style="max-width: 1000px;">
+        <h4>Important!</h4>
+        <p>Please note that this is a demo site. Safepay payments use its sandbox environment.
+            Don't use your real card details for payments. Use the given test credentials below to make payments.
+        </p>
+        <p>Card Number: 5555 5555 5555 4444 | Expiry Date: 12/29 | CVV: 123</p>
+        <p>You can use any random details for the rest of sections to make payments.</p>
+    </div>
+    {% endif %}
+
     <div class="container">
-
-
         <div class="row">
-
             <aside class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-4 text-center">Payment Details</h4>
+                        <h4 class="card-title mb-4 text-center" style="margin-top: 10px">Payment Details</h4>
                     </div>
                     <div class="card-body">
                         <div>
@@ -34,23 +59,33 @@
                         {% endif %}
                     </div>
                 </div> <!-- card.// -->
-                <div class="card">
+
+                <div class="card" style="margin-top: 20px">
                     <div class="card-header">
-                        <h4 class="card-title mb-4">Payment Method</h4>
+                        <h4 class="card-title mb-4 text-center" style="margin-top: 10px">Payment Method</h4>
                     </div>
                     <div class="card-body">
                         <div>
-                            {% if order.payment_method == 'Credit Card' %}
-                            <b>Payment Method:</b> PayPal
+                            <b>Payment Method:</b>
+                            {% if payment_method == 'Safepay' %}
+                                Safepay <span class="text-muted">(Test Payment Gateway)</span>
+                                {% if order.is_ordered %}<span class="text-success"> (Paid)</span>{% endif %}
+                            {% elif payment_method == 'Cash on Delivery' %}
+                                Cash on Delivery
+                                <div class="alert alert-info mt-3" role="alert">
+                                    Thanks for buying from us!
+                                    Your order has been saved. We will make sure to deliver the order on your given address as soon as possible.
+                                </div>
                             {% else %}
-                            <b>Payment Method:</b> Cash on Delivery
+                                Not Selected
                             {% endif %}
                         </div>
                     </div>
                 </div> <!-- card.// -->
-                <div class="card">
+
+                <div class="card" style="margin-top: 20px">
                     <div class="card-header">
-                        <h4 class="card-title mb-4">Review Products</h4>
+                        <h4 class="card-title mb-4 text-center" style="margin-top: 10px">Review Products</h4>
                     </div>
                     <table class="table table-borderless table-shopping-cart">
                         <thead class="text-muted">
@@ -62,21 +97,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for item in cart_items %}
+                            {% for item in order_products %}
                             <tr>
                                 <td>
                                     <figure class="itemside align-items-center">
-                                        <div class="aside"><img src="{{ item.product.images.url }}" class="img-sm">
-                                        </div>
+                                        <div class="aside"><img src="{{ item.product.images.url }}" class="img-sm"></div>
                                         <figcaption class="info">
-                                            <a href="{{ item.product.get_url }}"
-                                                class="title text-dark">{{item.product.product_name }}</a>
+                                            <a href="{{ item.product.get_url }}" class="title text-dark">{{ item.product.product_name }}</a>
                                             <p class="text-muted small">
-                                                {% if item.variations.all %}
-                                                {% for variation in item.variations.all %}
-                                                {{ variation.variation_category|capfirst }}: {{ variation.variation_value|capfirst }}
-                                                {% endfor%}
-                                                {% endif %}
+                                                {% if item.color %}Color: {{ item.color|capfirst }}{% endif %}
+                                                {% if item.size %}Size: {{ item.size|capfirst }}{% endif %}
                                             </p>
                                         </figcaption>
                                     </figure>
@@ -85,23 +115,23 @@
                                     <div class="col">
                                         <div class="input-group input-spinner">
                                             <label class="fw-bold">{{item.quantity}}</label>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="price-wrap">
                                         <var class="price">${{ item.sub_total|floatformat:2 }}</var>
-                                        <small class="text-muted"> ${{ item.product.price}} each </small>
-                                    </div> <!-- price-wrap .// -->
+                                        <small class="text-muted"> ${{ item.product_price|floatformat:2 }} each </small>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div> <!-- card.// -->
-
             </aside> <!-- col.// -->
 
             <aside class="col-lg-4">
-
                 <div class="card">
                     <div class="card-body">
                         <dl class="dlist-align">
@@ -117,20 +147,35 @@
                             <dd class="text-right text-dark b"><strong>${{ grand_total|floatformat:2 }}</strong></dd>
                         </dl>
                         <hr>
-                        <p class="text-center mb-3">
-                            <img src="{% static 'images/misc/payments.png' %}" height="26">
-                        </p>
-                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Make Payment </a>
+
+                        {% if order.is_ordered %}
+                            <button type="button" class="btn btn-success btn-block" disabled>Order Placed</button>
+                        {% else %}
+                            <div class="dropdown">
+                                <button class="btn btn-primary btn-block dropdown-toggle" type="button" id="paymentDropdown" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Select Payment Method
+                                </button>
+                                <div class="dropdown-menu w-100 text-center" aria-labelledby="paymentDropdown">
+                                    <!-- Safepay Option -->
+                                    <form method="post" action="{% url 'start_safepay_payment' order.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item py-2">Pay with Safepay</button>
+                                    </form>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <!-- Cash on Delivery Option -->
+                                    <form method="post" action="{% url 'place_cod_order' order.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item py-2">Cash on Delivery</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div> <!-- card-body.// -->
                 </div> <!-- card.// -->
-
             </aside> <!-- col.// -->
-
-
         </div>
-
-        <!-- ============================ COMPONENT 1 END .// ================================= -->
-
     </div> <!-- container .//  -->
 </section>
 {% endblock %}

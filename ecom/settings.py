@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-*7jn+ild!z8(bms7q0++0^qz9+3o)$xyi&%gbfh8ab7y5$_w!_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1'] + [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
@@ -152,10 +156,17 @@ EMAIL_HOST_USER = 's11smehar432@gmail.com'
 EMAIL_HOST_PASSWORD = 'rsbbutnbnstzaxau'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+SAFEPAY_PUBLIC_KEY = os.environ.get('SAFEPAY_PUBLIC_KEY', '')
+# SAFEPAY_PUBLIC_KEY = "sec_b56b57fd-17b3-48e8-a32c-0ff3eede23a2"
+SAFEPAY_SECRET_KEY = os.environ.get('SAFEPAY_SECRET_KEY', '')
+# SAFEPAY_SECRET_KEY = "72da43cf0af5fc99626c4f0027630f919c0fa76a1f9194bd5a5b17e6717c3c2d"
+
 
 from django.contrib.messages import constants as messages
 
 MESSAGE_TAGS = {
     messages.INFO: "",
 }
+
+SAFEPAY_WEBHOOK_SECRET = os.environ.get('SAFEPAY_WEBHOOK_SECRET', '')
 

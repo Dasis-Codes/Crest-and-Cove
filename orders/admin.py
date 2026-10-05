@@ -10,4 +10,10 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 admin.site.register(OrderProduct)
-admin.site.register(Payment)
+# admin.site.register(Payment)
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+	list_display = ('payment_id', 'payment_method', 'status', )
+	list_filter = ('status', 'payment_method')
+
+
