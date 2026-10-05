@@ -33,6 +33,18 @@
 
                             <hr>
 
+                            <div class="mb-3">
+                                {% if single_product.stock > 0 %}
+                                <span class="text-success font-weight-bold">
+                                    <i class="fas fa-check-circle"></i> Stock Available: {{ single_product.stock }}
+                                </span>
+                                {% else %}
+                                <span class="text-danger font-weight-bold">
+                                    <i class="fas fa-times-circle"></i> Out of stock
+                                </span>
+                                {% endif %}
+                            </div>
+
                             <div class="row">
                                 <div class="col-12">
                                     <label for="color">Color</label>
@@ -63,16 +75,15 @@
 
                             <hr>
 
-                            {% if single_product.stock <= 0 %}
-                                <h3>
-                                    <span class="badge badge-danger">Out of Stock</span>
+                            {% if single_product.stock <= 0 %} <h3>
+                                <span class="badge badge-danger">Out of Stock</span>
                                 </h3>
-                            {% else %}
+                                {% else %}
                                 <button type="submit" class="btn btn-primary">
                                     <span class="text">Add to Cart</span>
                                     <i class="fas fa-shopping-cart"></i>
                                 </button>
-                            {% endif %}
+                                {% endif %}
                         </form>
                     </article>
                 </main>

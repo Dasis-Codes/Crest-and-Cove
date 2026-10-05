@@ -15,6 +15,7 @@ from django.http import (
     HttpResponseServerError,
     JsonResponse,
 )
+from store.models import Product
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -44,7 +45,7 @@ def _complete_paid_order(order, payment, tracker):
         locked_order.status = 'Accepted'
         locked_order.save(update_fields=['payment', 'is_ordered', 'status', 'updated_at'])
 
-        order_products = locked_order.orderproduct_set.all()
+        order_products = locked_order.orderproduct_set.select_related('product').all()
         cart_item_ids = list(
             order_products.exclude(cart_item__isnull=True)
             .values_list('cart_item_id', flat=True)
@@ -450,7 +451,13 @@ def place_cod_order(request, order_id): # or order_id via POST
                 'payment', 'payment_method', 'is_ordered', 'status', 'updated_at'
             ])
 
-            order_products = order.orderproduct_set.all()
+            order_products = order.orderproduct_set.select_related('product').all()
+            for op in order_products:
+                product = Product.objects.select_for_update().get(pk=op.product.pk)
+                if product.stock >= op.quantity:
+                    product.stock -= op.quantity
+                    product.save(update_fields=['stock'])
+
             cart_item_ids = list(
                 order_products.exclude(cart_item__isnull=True)
                 .values_list('cart_item_id', flat=True)
@@ -461,5 +468,5 @@ def place_cod_order(request, order_id): # or order_id via POST
                 user=order.user,
             ).delete()
 
-        messages.success(request, f'Order {order.order_number} placed with Cash on Delivery.')
+        # messages.success(request, f'Order {order.order_number} placed with Cash on Delivery.')
         return redirect('payments', order_id=order.id)

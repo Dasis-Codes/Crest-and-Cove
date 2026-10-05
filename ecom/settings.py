@@ -150,13 +150,21 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
+EMAIL_HOST_USER = 's11smehar432@gmail.com'
+# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  
+
+EMAIL_HOST_PASSWORD = 'rsbbutnbnstzaxau'
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SAFEPAY_PUBLIC_KEY = os.environ.get('SAFEPAY_PUBLIC_KEY', '')
+# SAFEPAY_PUBLIC_KEY = "sec_b56b57fd-17b3-48e8-a32c-0ff3eede23a2"
 
 SAFEPAY_SECRET_KEY = os.environ.get('SAFEPAY_SECRET_KEY', '')
+# SAFEPAY_SECRET_KEY = "72da43cf0af5fc99626c4f0027630f919c0fa76a1f9194bd5a5b17e6717c3c2d"
+
 
 
 from django.contrib.messages import constants as messages

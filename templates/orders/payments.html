@@ -74,7 +74,15 @@
                                 Cash on Delivery
                                 <div class="alert alert-info mt-3" role="alert">
                                     Thanks for buying from us!
-                                    Your order has been saved. We will make sure to deliver the order on your given address as soon as possible.
+                                    Your order has been saved. We will make sure to deliver the order on the following address as soon as possible.
+                                    <div>
+                                        <b>Address:</b> {{order.full_address}}
+                                    </div>
+                                    {% if order.country %}
+                                    <div>
+                                        <b>Country:</b> {{order.country}}
+                                    </div>
+                                    {% endif %}
                                 </div>
                             {% else %}
                                 Not Selected
