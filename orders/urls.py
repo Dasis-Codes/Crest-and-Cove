@@ -11,5 +11,6 @@ urlpatterns = [
     path('payments/<int:order_id>/start/', views.start_safepay_payment, name='start_safepay_payment'),
     path('payments/<int:order_id>/success/', views.safepay_success, name='safepay_success'),
     path('payments/<int:order_id>/cancel/', views.safepay_cancel, name='safepay_cancel'),
+    path('invoice/<int:order_id>/', views.invoice, name='invoice'),
 ]
 

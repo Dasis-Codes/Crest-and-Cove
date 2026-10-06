@@ -158,6 +158,7 @@
 
                         {% if order.is_ordered %}
                             <button type="button" class="btn btn-success btn-block" disabled>Order Placed</button>
+                            <a class="btn btn-success btn-block" href="{% url 'invoice' order.id %}">View Invoice</a>
                         {% else %}
                             <div class="dropdown">
                                 <button class="btn btn-primary btn-block dropdown-toggle" type="button" id="paymentDropdown" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -470,3 +470,17 @@ def place_cod_order(request, order_id): # or order_id via POST
 
         # messages.success(request, f'Order {order.order_number} placed with Cash on Delivery.')
         return redirect('payments', order_id=order.id)
+
+
+@login_required(login_url='login')
+def invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order_products = order.orderproduct_set.select_related('product', 'variation').all()
+    subtotal = order.order_total - order.tax
+
+    context = {
+        'order': order,
+        'order_products': order_products,
+        'subtotal': subtotal,
+    }
+    return render(request, 'orders/invoice.html', context)

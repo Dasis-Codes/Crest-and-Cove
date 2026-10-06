@@ -21,7 +21,7 @@
                         <p>We have not received a verified result for order {{ order.order_number }} yet. Do not submit another payment until its status is checked.</p>
                         {% endif %}
                         <a href="{% url 'payments' order.id %}" class="btn btn-primary">View order</a>
-                        <a href="{% url 'store' %}" class="btn btn-light">Continue shopping</a>
+                        <a href="{% url 'invoice' order.id %}" class="btn btn-light">View invoice</a>
                     </div>
                 </div>
             </div>

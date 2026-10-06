@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                
+                <!-- Invoice Header -->
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h3 class="text-dark font-weight-bold">Crest & Cove</h3>
+                        <p class="text-muted mb-1">E-Commerce Store</p>
+                        <p class="text-muted">Support: s11smehar432@gmail.com</p>
+                    </div>
+                    <div class="col-sm-6 text-sm-right">
+                        <h4 class="text-primary font-weight-bold">INVOICE</h4>
+                        <p class="mb-1"><strong>Order Number:</strong> {{ order.order_number }}</p>
+                        <p class="mb-1"><strong>Invoice Date:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+                        <p class="mb-1"><strong>Payment Status:</strong> <span class="badge badge-success">{{ order.payment.status|default:"Paid" }}</span></p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Customer & Shipping Info -->
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h6 class="text-muted font-weight-bold">BILLED & SHIPPED TO:</h6>
+                        <h5 class="mb-1">{{ order.full_name }}</h5>
+                        <p class="mb-1">{{ order.address_line_1 }}{% if order.address_line_2 %}, {{ order.address_line_2 }}{% endif %}</p>
+                        <p class="mb-1">{{ order.city }}, {{ order.state }}, {{ order.country }}</p>
+                        <p class="mb-1">Email: {{ order.email }}</p>
+                        <p class="mb-1">Phone: {{ order.phone }}</p>
+                    </div>
+                    <div class="col-sm-6 text-sm-right">
+                        <h6 class="text-muted font-weight-bold">PAYMENT METHOD:</h6>
+                        <p class="mb-1"><strong>{{ order.payment_method|default:"Online Payment" }}</strong></p>
+                        {% if order.payment %}
+                        <p class="text-muted small">Transaction ID: {{ order.payment.payment_id }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Purchased Items Table -->
+                <div class="table-responsive-sm mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Product</th>
+                                <th scope="col">Variations</th>
+                                <th scope="col" class="text-center">Quantity</th>
+                                <th scope="col" class="text-right">Unit Price</th>
+                                <th scope="col" class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_products %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.product.product_name }}</strong>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">
+                                        {% if item.color %}Color: {{ item.color|capfirst }} | {% endif %}
+                                        {% if item.size %}Size: {{ item.size|capfirst }}{% endif %}
+                                    </span>
+                                </td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-right">${{ item.product_price|floatformat:2 }}</td>
+                                <td class="text-right">${{ item.sub_total|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals Section -->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p class="text-muted small">Thank you for shopping with Crest & Cove! If you have any questions about your order, please reach out to our support team.</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Subtotal:</strong></td>
+                                        <td class="text-right">${{ subtotal|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tax (1.4%):</strong></td>
+                                        <td class="text-right">${{ order.tax|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Grand Total:</strong></td>
+                                        <td class="text-right text-dark"><strong>${{ order.order_total|floatformat:2 }}</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Actions / Print Button -->
+                <div class="text-right d-print-none">
+                    <button onclick="window.print();" class="btn btn-secondary">
+                        <i class="fa fa-print"></i> Print Invoice
+                    </button>
+                    <a href="{% url 'payments' order.id %}" class="btn btn-primary">
+                        <i class="fa fa-eye"></i> View Order
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
