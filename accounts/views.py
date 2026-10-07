@@ -20,6 +20,9 @@ from urllib.parse import urlencode
 from carts.views import _cart_id, cart
 from carts.models import Cart, CartItem
 import requests
+from orders.models import Order
+from store.models import ReviewRating
+from django.contrib.auth import update_session_auth_hash
 
 account_activation_token = PasswordResetTokenGenerator()
 # Create your views here.
@@ -166,7 +169,20 @@ def activate(request, uidb64, token):
 
 @login_required(login_url='login')
 def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
+    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
+    orders_count = orders.count()
+    recent_orders = orders[:3]
+    
+    from store.models import ReviewRating
+    reviews_count = ReviewRating.objects.filter(user=request.user, status=True).count()
+
+    context = {
+        'orders': orders,
+        'orders_count': orders_count,
+        'recent_orders': recent_orders,
+        'reviews_count': reviews_count,
+    }
+    return render(request, 'accounts/dashboard.html', context)
 
 
 def forgotPassword(request):
@@ -239,3 +255,43 @@ def resetPassword(request):
             messages.error(request, 'Passwords do not match. Please try again.')
             return render(request, 'accounts/resetPassword.html')
     return render(request, 'accounts/resetPassword.html')
+
+
+@login_required(login_url='login')
+def my_orders(request):
+    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'accounts/my_orders.html', context)
+
+@login_required(login_url='login')
+def my_reviews(request):
+    reviews = ReviewRating.objects.filter(user=request.user, status=True).order_by('-date_added')
+    context = {
+        'reviews': reviews,
+    }
+    return render(request, 'accounts/my_reviews.html', context)
+
+@login_required(login_url='login')
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+
+        user = request.user
+        if user.check_password(current_password):
+            if new_password == confirm_password:
+                user.set_password(new_password)
+                user.save()
+                # Crucial: Keeps the user logged in after password change so they don't get kicked out!
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Your password has been changed successfully.')
+                return redirect('dashboard')
+            else:
+                messages.error(request, 'New passwords do not match.')
+        else:
+            messages.error(request, 'Incorrect current password.')
+            
+    return render(request, 'accounts/change_password.html')

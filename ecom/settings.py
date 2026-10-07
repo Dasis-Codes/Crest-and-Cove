@@ -41,12 +41,14 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
     'category',
     'accounts',
     'store',
@@ -179,3 +181,11 @@ MESSAGE_TAGS = {
 
 SAFEPAY_WEBHOOK_SECRET = os.environ.get('SAFEPAY_WEBHOOK_SECRET', '')
 
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'v3d0hlzo',
+    'API_KEY': '814445486731778',
+    'API_SECRET': 'KTBWvzi9aF1qA2YSibc8OiH7_OA',
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

@@ -1,103 +1,126 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-<!-- ========================= SECTION CONTENT ========================= -->
-<section class="section-conten padding-y bg">
-
+{% extends 'base.html' %} {% load static %} {% block content %} <section class="section-content padding-y bg">
     <div class="container">
         {% include "includes/alerts.html" %}
         <div class="row">
-            <aside class="col-md-3">
-                <!--   SIDEBAR   -->
-                <ul class="list-group">
-                    <a class="list-group-item active" href="#"> My order history </a>
-                    <a class="list-group-item" href="#"> Transactions </a>
-                    <a class="list-group-item" href="#"> Return and refunds </a>
-                    <a class="list-group-item" href="#">Settings </a>
-                    <a class="list-group-item" href="#"> My Selling Items </a>
-                    <a class="list-group-item" href="#"> Received orders </a>
-                </ul>
-                <br>
-                <a class="btn btn-light btn-block" href="{% url 'logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Log
-                        out</span> </a>
-                <!--   SIDEBAR .//END   -->
-            </aside>
-            <main class="col-md-9">
-                <article class="card">
-                    <header class="card-header">
-                        <strong class="d-inline-block mr-3">Order ID: 6123456789</strong>
-                        <span>Order Date: 16 December 2018</span>
-                    </header>
+            <!-- ========================= SIDEBAR ========================= -->
+            {% include "includes/dashboard_sidebar.html" %}
+            <!-- ========================= MAIN CONTENT ========================= -->
+            <main class="col-md-9"> <!-- ========================= WELCOME CARD ========================= -->
+                <div class="card mb-4">
+                    <div class="card-header"> <strong>My Dashboard</strong> </div>
+                    <div class="card-body">
+                        <h4> Welcome back, {{ user.first_name }}! </h4>
+                        <p class="text-muted mb-0"> Manage your orders, account information and reviews from your
+                            dashboard. </p>
+                    </div>
+                </div> <!-- ========================= ACCOUNT SUMMARY ========================= -->
+                <div class="row mb-4"> <!-- ORDERS -->
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted"> Total Orders </h6>
+                                <!-- Replace 10 with dynamic order count later -->
+                                <h2 class="mb-3"> {{ orders_count }} </h2>
+                                <a href="{% url 'my_orders' %}" class="btn btn-outline-primary"
+                                    style="border-radius: 23px;"> View Orders </a>
+                            </div>
+                        </div>
+                    </div> <!-- REVIEWS -->
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted"> My Reviews </h6>
+                                <!-- Replace 4 with dynamic review count later -->
+                                <h2 class="mb-3"> {{ reviews_count }} </h2> <a href="{% url 'my_reviews' %}"
+                                    class="btn btn-outline-primary" style="border-radius: 23px;"> View Reviews </a>
+                            </div>
+                        </div>
+                    </div> <!-- ACCOUNT -->
+                    <!-- <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted"> Account </h6>
+                                <h5 class="mb-3"> {{ user.first_name }} {{ user.last_name }} </h5> <a href="#"
+                                    class="btn btn-outline-primary" style="border-radius: 23px;"> My Account </a>
+                            </div>
+                        </div>
+                    </div> -->
+                </div> <!-- ========================= PROFILE + RECENT ORDERS ========================= -->
+                <div class="row"> <!-- ========================= PROFILE CARD ========================= -->
+                    <div class="col-md-5 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header"> <strong>My Profile</strong> </div>
+                            <div class="card-body text-center"> <!-- Temporary profile image --> <img
+                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHzgIvj_tKuzbc5yaALqcWzplgTmsGHD2t4CW7WwYDVw&s=10"
+                                    alt="Profile Picture" width="100" height="100"
+                                    style="border-radius: 50%; object-fit: cover;">
+                                <h5 class="mt-3 mb-1"> {{ user.first_name }} {{ user.last_name }} </h5>
+                                <p class="text-muted"> {{ user.email }} </p>
+                                <hr>
+                                <div class="text-left">
+                                    <p> <strong>Username:</strong> {{ user.username }} </p>
+                                    <p> <strong>First Name:</strong> {{ user.first_name }} </p>
+                                    <p> <strong>Last Name:</strong> {{ user.last_name }} </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- ========================= RECENT ORDERS ========================= -->
+                    <div class="col-md-7 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header"> <strong>Recent Orders</strong> </div>
+                            <div class="card-body">
+                                {% if recent_orders %}
+                                {% for order in recent_orders %}
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <strong> Order #{{ order.order_number }} </strong>
+                                        <span
+                                            class="badge {% if order.status == 'Completed' or order.status == 'Accepted' %}badge-success{% elif order.status == 'Cancelled' %}badge-danger{% else %}badge-warning{% endif %}">
+                                            {{ order.status }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted"> {{ order.created_at|date:"M d, Y" }} · ${{
+                                        order.order_total|floatformat:2 }} </small>
+                                </div>
+                                {% endfor %}
+                                <a href="{%url 'my_orders'%}" class="btn btn-outline-primary mt-3"
+                                    style="border-radius: 23px;">
+                                    View All Orders
+                                </a>
+                                {% else %}
+                                <p class="text-muted mb-0">You haven't placed any orders yet.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- ========================= ACCOUNT INFORMATION ========================= -->
+                <div class="card mb-4">
+                    <div class="card-header"> <strong>Account Information</strong> </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-8">
-                                <h6 class="text-muted">Delivery to</h6>
-                                <p>Michael Jackson <br>
-                                    Phone +1234567890 Email: myname@pixsellz.com <br>
-                                    Location: Home number, Building name, Street 123, Tashkent, UZB <br>
-                                    P.O. Box: 100123
-                                </p>
+                            <div class="col-md-6">
+                                <p> <strong>Email</strong><br> {{ user.email }} </p>
+                                <p> <strong>Phone</strong><br> {{ user.phone_no|default:"Not added yet" }} </p>
                             </div>
-                            <div class="col-md-4">
-                                <h6 class="text-muted">Payment</h6>
-                                <span class="text-success">
-                                    <i class="fab fa-lg fa-cc-visa"></i>
-                                    Visa **** 4216
-                                </span>
-                                <p>Subtotal: $356 <br>
-                                    Shipping fee: $56 <br>
-                                    <span class="b">Total: $456 </span>
-                                </p>
+                            <div class="col-md-6">
+                                <p> <strong>Address</strong><br> Not added yet </p>
+                                <p> <strong>Member Since</strong><br> {{ user.date_joined|date:"F Y" }} </p>
                             </div>
-                        </div> <!-- row.// -->
-                    </div> <!-- card-body .// -->
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <tr>
-                                <td width="65">
-                                    <img src="../images/items/1.jpg" class="img-xs border">
-                                </td>
-                                <td>
-                                    <p class="title mb-0">Product name goes here </p>
-                                    <var class="price text-muted">USD 145</var>
-                                </td>
-                                <td> Seller <br> Nike clothing </td>
-                                <td width="250"> <a href="#" class="btn btn-outline-primary">Track order</a> <a href="#"
-                                        class="btn btn-light"> Details </a> </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <img src="../images/items/2.jpg" class="img-xs border">
-                                </td>
-                                <td>
-                                    <p class="title mb-0">Another name goes here </p>
-                                    <var class="price text-muted">USD 15</var>
-                                </td>
-                                <td> Seller <br> ABC shop </td>
-                                <td> <a href="#" class="btn btn-outline-primary">Track order</a> <a href="#"
-                                        class="btn btn-light"> Details </a> </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <img src="../images/items/3.jpg" class="img-xs border">
-                                </td>
-                                <td>
-                                    <p class="title mb-0">The name of the product goes here </p>
-                                    <var class="price text-muted">USD 145</var>
-                                </td>
-                                <td> Seller <br> Wallmart </td>
-                                <td> <a href="#" class="btn btn-outline-primary">Track order</a> <a href="#"
-                                        class="btn btn-light"> Details </a> </td>
-                            </tr>
-                        </table>
-                    </div> <!-- table-responsive .end// -->
-                </article> <!-- order-group.// -->
+                        </div>
+                    </div>
+                </div> <!-- ========================= QUICK ACTIONS ========================= -->
+                <div class="card">
+                    <div class="card-header"> <strong>Quick Actions</strong> </div>
+                    <div class="card-body">
+                        <a href="{%url 'my_orders'%}" class="btn btn-primary mr-2 mb-2"
+                            style="border-radius: 23px;"> My Orders </a> 
+                        <a href="{%url 'my_reviews'%}" class="btn btn-outline-primary mr-2 mb-2"
+                            style="border-radius: 23px;"> My Reviews </a> 
+                        <a href="{%url 'change_password'%}" class="btn btn-outline-primary mr-2 mb-2" style="border-radius: 23px;"> Change Password </a>
+                        <a href="{% url 'logout'%}" class="btn btn-outline-danger mb-2" style="border-radius: 23px;"> Logout </a>
+                    </div>
+                </div>
             </main>
-        </div> <!-- row.// -->
+        </div>
     </div>
-
-
-</section>
-<!-- ========================= SECTION CONTENT END// ========================= -->
-{% endblock %}
+</section> {% endblock %}
