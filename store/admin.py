@@ -26,4 +26,8 @@ class VariationAdmin(admin.ModelAdmin):
     list_filter = ('product','variation_category','variation_value',)
 
 admin.site.register(Variation, VariationAdmin)
-admin.site.register(ReviewRating)
+
+class ReviewRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'rating')
+    list_filter = ('product','rating')
+admin.site.register(ReviewRating, ReviewRatingAdmin)

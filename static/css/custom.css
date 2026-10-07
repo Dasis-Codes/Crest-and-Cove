@@ -1,32 +1,93 @@
-/* HIDE RADIO BUTTON  */
-.rate > input{
+/* ============================
+PRODUCT REVIEW STAR RATING
+============================ */
+.rate {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.rate input {
     display: none;
 }
 
-.rate{
-    display: inline-block;
-    border: 0;
-}
-
-.rate > label{
-    float: right;
-}
-
-/* STARS */
-.rate > label:before{
-    display : inline-block;
-    font-size: 1.1rem;
-    font-family: FontAwesome;
-    content: "\f005";
+.rate label {
+    position: relative;
+    display: block;
+    width: 24px;
+    height: 28px;
     margin: 0;
     cursor: pointer;
-
-
+    color: #ccc;
 }
 
-.rate .half:before{
-    content: "\f089";
+/* Full star */
+.rate label:before {
+    content: "\f005";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 1.5rem;
     position: absolute;
-    padding-right: 0;
+    left: 0;
+    top: 0;
+    transition: color 0.15s ease;
 }
 
+/* Half star (if you use it) */
+.rate label.half {
+    width: 12px;
+    overflow: hidden;
+    margin-right: -12px;
+    z-index: 2;
+}
+
+/* Hover: Highlight the hovered star and all stars AFTER it in the DOM (which are visually to the LEFT) */
+.rate > input:checked ~ label:before,
+.rate:not(:checked) > label:hover:before,
+.rate:not(:checked) > label:hover ~ label:before {
+    color: #ffc107;
+}
+
+/* Selected rating state */
+.rate > input:checked + label:before,
+.rate > input:checked ~ label:before {
+    color: #ffc107;
+}
+
+.review-stars {
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.review-stars .fa-star,
+.review-stars .fa-star-half-alt {
+    color: #ffc107;
+}
+
+.review-stars .far.fa-star {
+    color: #ccc;
+}
+
+.product-rating {
+    margin-bottom: 15px;
+}
+
+.product-rating .rating-value {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.product-rating .rating-stars i {
+    color: #ffc107;
+    margin-right: 2px;
+}
+
+.product-rating .rating-stars .far {
+    color: #ccc;
+}
+
+.product-rating .review-count {
+    color: #777;
+    margin-left: 5px;
+}
